@@ -75,11 +75,15 @@ const App = () => {
 
   return (
     <div>
-      <h1>House cleaning checklist</h1>
+      <div className={`content-title`}>
+        <h1>House cleaning checklist</h1>
+      </div>
+      <div className={`request`}>
       <input
         type="text"
         value={newTodo}
         onChange={(e) => setNewTodo(e.target.value)}
+        placeholder="Type your task"
       />
       <button
         onClick={handleAddTodo}
@@ -88,7 +92,7 @@ const App = () => {
       >
         Add New Task
       </button>
-
+      </div>
       <ul>
         {todos.map(todo => (
           <li key={todo.id} className={todo.done ? 'done' : ''}>
