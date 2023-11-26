@@ -63,7 +63,7 @@ li.done {
   height: 60px;
   font-size: 20px;
   margin-top: 50px;
-  margin-left: 0px;
+  margin-left: 50px;
   margin-bottom: 25px;
 }
 
@@ -80,7 +80,7 @@ li.done {
     padding: 10px;
     border-radius: 10px;
     background-color: white;
-    width: 60%;
+    width: 75%;
     margin-left: 20px;
 }
 
@@ -98,13 +98,11 @@ h1 {
 span.task-text {
   background-color: transparent;
 }
-/*
-.react-datepicker-wrapper {
-  width: 25%;
-  margin-right: -133px;
-}
-.react-datepicker__input-container {
 
-  background-color: #cdcdcd;
-  width: 70%;
-} */
+.date-edit {
+  margin-left: -91px;
+}
+
+.react-datepicker__input-container {
+  width: 525px;
+}

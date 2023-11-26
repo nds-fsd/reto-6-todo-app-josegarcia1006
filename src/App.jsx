@@ -105,12 +105,7 @@ const App = () => {
           onChange={(e) => setNewTodo(e.target.value)}
           placeholder="Type your task"
         />
-        <DatePicker
-          selected={selectedDate}
-          onChange={(date) => setSelectedDate(date)}
-          dateFormat="yyyy-MM-dd"
-          placeholderText="Select a date"
-        />
+        
         <button
           onClick={handleAddTodo}
           disabled={editedTodo !== null}
@@ -118,6 +113,12 @@ const App = () => {
         >
           Add New Task
         </button>
+        <br/> <DatePicker
+          selected={selectedDate}
+          onChange={(date) => setSelectedDate(date)}
+          dateFormat="yyyy-MM-dd"
+          placeholderText="Select a date"
+        />
       </div>
       <ul>
         {todos.map(todo => (
@@ -136,12 +137,15 @@ const App = () => {
                   onChange={(e) => setNewTodo(e.target.value)}
                   className={`input`}
                 />
-                <DatePicker
-                  selected={selectedDate}
-                  onChange={(date) => setSelectedDate(date)}
-                  dateFormat="yyyy-MM-dd"
-                  placeholderText="Select a date"
-                />
+                <br />
+                <div className={`date-edit`} >
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={(date) => setSelectedDate(date)}
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText="Select a date"
+                  />
+                </div>
                 <button onClick={() => handleEditTodo(todo._id, newTodo, todo.done, selectedDate)} className={`button`}>
                   Save
                 </button>
