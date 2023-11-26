@@ -7,23 +7,32 @@ const App = () => {
   const [newTodo, setNewTodo] = useState('');
   const [editedTodo, setEditedTodo] = useState(null);
 
+  const CACHE_EXPIRATION_TIME = 1; 
+
   useEffect(() => {
-    const storedTodos = localStorage.getItem('todos');
-    if (storedTodos) {
-      setTodos(JSON.parse(storedTodos));
+    const getCurrentDate = () => new Date();
+
+    const lastUpdateFromStorage = localStorage.getItem('lastCacheUpdate');
+    if (!lastUpdateFromStorage || (getCurrentDate() - new Date(lastUpdateFromStorage)) > CACHE_EXPIRATION_TIME) {
+      fetchTodosFromServer();
     } else {
-      fetchTodos();
+      const cachedData = JSON.parse(localStorage.getItem('todos'));
+      setTodos(cachedData);
     }
   }, []);
 
-  const fetchTodos = () => {
+  const fetchTodosFromServer = () => {
     axios.get('http://localhost:3000/todo')
       .then(response => {
+        console.log(response.data);
         setTodos(response.data);
         saveTodosToLocalStorage(response.data);
+        localStorage.setItem('lastCacheUpdate', getCurrentDate().toString());
       })
       .catch(error => console.error('Error fetching todos:', error));
   };
+
+  const getCurrentDate = () => new Date();
 
   const saveTodosToLocalStorage = (todos) => {
     localStorage.setItem('todos', JSON.stringify(todos));
@@ -40,10 +49,10 @@ const App = () => {
       .catch(error => console.error('Error adding todo:', error));
   };
 
-  const handleEditTodo = (id, newText, newDone) => {
-    axios.patch(`http://localhost:3000/todo/${id}`, { text: newText, done: newDone })
+  const handleEditTodo = (_id, newText, newDone) => {
+    axios.patch(`http://localhost:3000/todo/${_id}`, { text: newText, done: newDone })
       .then(response => {
-        const updatedTodos = todos.map(todo => (todo.id === id ? response.data : todo));
+        const updatedTodos = todos.map(todo => (todo._id === _id ? response.data : todo));
         setTodos(updatedTodos);
         saveTodosToLocalStorage(updatedTodos);
         setEditedTodo(null);
@@ -51,81 +60,79 @@ const App = () => {
       .catch(error => console.error('Error editing todo:', error));
   };
 
-  const handleDeleteTodo = (id) => {
-    axios.delete(`http://localhost:3000/todo/${id}`)
+  const handleDeleteTodo = (_id) => {
+    axios.delete(`http://localhost:3000/todo/${_id}`)
       .then(() => {
-        const updatedTodos = todos.filter(todo => todo.id !== id);
+        const updatedTodos = todos.filter(todo => todo._id !== _id);
         setTodos(updatedTodos);
         saveTodosToLocalStorage(updatedTodos);
       })
       .catch(error => console.error('Error deleting todo:', error));
   };
 
-  const handleToggleDone = (id, currentDone) => {
+  const handleToggleDone = (_id, currentDone) => {
     const newDone = !currentDone;
-    const updatedTodos = todos.map(todo => (todo.id === id ? { ...todo, done: newDone } : todo));
+    const updatedTodos = todos.map(todo => (todo._id === _id ? { ...todo, done: newDone } : todo));
     setTodos(updatedTodos);
     saveTodosToLocalStorage(updatedTodos);
   };
 
-  const handleEditTodoStart = (id) => {
-    setNewTodo(todos.find(todo => todo.id === id).text);
-    setEditedTodo(id);
+  const handleEditTodoStart = (_id) => {
+    setNewTodo(todos.find(todo => todo._id === _id).text);
+    setEditedTodo(_id);
   };
 
   return (
     <div>
       <div className={`content-title`}>
-        <h1>House cleaning checklist</h1>
+        <h1>To do App</h1>
       </div>
       <div className={`request`}>
-      <input
-        type="text"
-        value={newTodo}
-        onChange={(e) => setNewTodo(e.target.value)}
-        placeholder="Type your task"
-      />
-      <button
-        onClick={handleAddTodo}
-        disabled={editedTodo !== null}
-        className={`add-button`}
-      >
-        Add New Task
-      </button>
+        <input
+          type="text"
+          value={newTodo}
+          onChange={(e) => setNewTodo(e.target.value)}
+          placeholder="Type your task"
+        />
+        <button
+          onClick={handleAddTodo}
+          disabled={editedTodo !== null}
+          className={`add-button`}
+        >
+          Add New Task
+        </button>
       </div>
       <ul>
         {todos.map(todo => (
-          <li key={todo.id} className={todo.done ? 'done' : ''}>
-            <>
-              {editedTodo === todo.id ? (
-                <>
-                  <input
-                    type="text"
-                    value={newTodo}
-                    onChange={(e) => setNewTodo(e.target.value)}
-                    className={`input`}
-                  />
-                  <button onClick={() => handleEditTodo(todo.id, newTodo, todo.done)} className={`button`}>
-                    Save
+          <li key={todo._id} className={todo.done ? 'done' : ''}>
+            {editedTodo === todo._id ? (
+              <>
+                <input
+                  type="text"
+                  value={newTodo}
+                  onChange={(e) => setNewTodo(e.target.value)}
+                  className={`input`}
+                />
+                <button onClick={() => handleEditTodo(todo._id, newTodo, todo.done)} className={`button`}>
+                  Save
+                </button>
+              </>
+            ) : (
+              <>
+                {todo.text}
+                <div className="button-container">
+                  <button onClick={() => handleEditTodoStart(todo._id)} disabled={editedTodo !== null} className={`button`}>
+                    Edit
                   </button>
-                </>
-              ) : (
-                <>
-                  {todo.text}
-                  <div className="button-container">
-                    <button onClick={() => handleEditTodoStart(todo.id)} disabled={editedTodo !== null} className={`button`}>
-                      Edit
-                    </button>
-                    <button onClick={() => handleDeleteTodo(todo.id)} disabled={editedTodo !== null} className={`button`}>
-                      Delete
-                    </button>
-                    <button onClick={() => handleToggleDone(todo.id, todo.done)} className={`button`}>
-                      {todo.done ? 'Undo' : 'Done'}
-                    </button>
-                  </div>
-                </>
-              )}
-            </>
+                  <button onClick={() => handleDeleteTodo(todo._id)} disabled={editedTodo !== null} className={`button`}>
+                    Delete
+                  </button>
+                  <button onClick={() => handleToggleDone(todo._id, todo.done)} className={`button`}>
+                    {todo.done ? 'Undo' : 'Done'}
+                  </button>
+                </div>
+              </>
+            )}
           </li>
         ))}
       </ul>
