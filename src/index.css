@@ -1,5 +1,3 @@
-/* index.css */
-
 ul {
   list-style-type: none;
   padding: 0;
@@ -107,22 +105,3 @@ span.task-text {
   width: 525px;
 }
 
-/* Animaciones */
-
-.fade-enter {
-  opacity: 1;
-}
-
-.fade-enter-active {
-  opacity: 1;
-  transition: opacity 500ms;
-}
-
-.fade-exit {
-  opacity: 1;
-}
-
-.fade-exit-active {
-  opacity: 1;
-  transition: opacity 500ms;
-}
