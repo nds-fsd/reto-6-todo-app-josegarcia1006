@@ -31,7 +31,10 @@ const App = () => {
         saveTodosToLocalStorage(response.data);
         localStorage.setItem('lastCacheUpdate', getCurrentDate().toString());
       })
-      .catch(error => console.error('Error fetching todos:', error));
+      .catch(error => {
+        alert('Error fetching todos. Please try again.');
+        console.error('Error fetching todos:', error);
+      });
   };
 
   const getCurrentDate = () => new Date();
@@ -41,6 +44,11 @@ const App = () => {
   };
 
   const handleAddTodo = () => {
+    if (!newTodo.trim() || selectedDate === null || selectedDate === undefined) {
+      alert('Please enter the task text and select a date.');
+      return;
+    }
+
     axios.post('http://localhost:3000/todo', { text: newTodo, fecha: selectedDate, done: false })
       .then(response => {
         const updatedTodos = [...todos, response.data];
@@ -49,7 +57,10 @@ const App = () => {
         setNewTodo('');
         setSelectedDate(new Date());
       })
-      .catch(error => console.error('Error adding todo:', error));
+      .catch(error => {
+        alert('Error adding todo. Please try again.');
+        console.error('Error adding todo:', error);
+      });
   };
 
   const handleEditTodo = (_id, newText, newDone, newDate) => {
@@ -60,7 +71,10 @@ const App = () => {
         saveTodosToLocalStorage(updatedTodos);
         setEditedTodo(null);
       })
-      .catch(error => console.error('Error editing todo:', error));
+      .catch(error => {
+        alert('Error editing todo. Please try again.');
+        console.error('Error editing todo:', error);
+      });
   };
 
   const handleDeleteTodo = (_id) => {
@@ -70,7 +84,10 @@ const App = () => {
         setTodos(updatedTodos);
         saveTodosToLocalStorage(updatedTodos);
       })
-      .catch(error => console.error('Error deleting todo:', error));
+      .catch(error => {
+        alert('Error deleting todo. Please try again.');
+        console.error('Error deleting todo:', error);
+      });
   };
 
   const handleToggleDone = (_id, currentDone) => {
@@ -84,7 +101,10 @@ const App = () => {
       .then(response => {
         console.log('Todo updated in the database:', response.data);
       })
-      .catch(error => console.error('Error updating todo in the database:', error));
+      .catch(error => {
+        alert('Error updating todo. Please try again.');
+        console.error('Error updating todo in the database:', error);
+      });
   };
 
   const handleEditTodoStart = (_id) => {
